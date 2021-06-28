@@ -8,8 +8,8 @@ import java.awt.*;
 public class Run {
 
     private JFrame frame;
-    private static int WIDTH = 300;
-    private static int HEIGHT = 300;
+    public static int WIDTH = 300;
+    public static int HEIGHT = 300;
 
     public static void main(String[] args) {
         System.out.println("Initialize...");

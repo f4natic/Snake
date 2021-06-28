@@ -7,13 +7,17 @@ import ru.fnt.util.Point;
 public class Cell {
 
     private Rectangle2D rect = null;
-    private Color color;
+    private Color color = null;
     private final int SIDE = 10;
 
     public void setRectangle(Point point) {
         double x = point.coordX - SIDE / 2;
         double y = point.coordY - SIDE / 2;
         rect = new Rectangle2D.Double(x, y, SIDE, SIDE);
+    }
+
+    public Rectangle2D getRectangle() {
+        return rect;
     }
 
     public void setColor(int r, int g ,int b) {
@@ -34,6 +38,16 @@ public class Cell {
         if(rect == null) {
             return;
         }
+        g.setColor(color);
         g.draw(rect);
+        g.fill(rect);
+    }
+
+    public boolean intersects(Cell cell) {
+        Rectangle2D rect2 = cell.getRectangle();
+        if(rect.intersects(rect2)){
+            return true;
+        }
+        return false;
     }
 }

@@ -7,64 +7,109 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ru.fnt.base.Directions;
-import ru.fnt.util.Rotation;
 import ru.fnt.util.Point;
+
+import javax.swing.*;
 
 public class Snake {
 
     private List<Cell> snake;
-    private List<Rotation> rotations;
     private Directions directions = Directions.RIGHT;
 
     public Snake() {
         snake = new ArrayList<>();
-        rotations = new ArrayList<>();
         addCell();
         addCell();
-        addCell();
+    }
+
+    public Cell getHead() {
+        return snake.get(0);
     }
 
     public void addCell() {
         if(snake.isEmpty()) {
             Cell cell = new Cell();
-            cell.setRectangle(new Point(55, 55));
+            cell.setColor(0, 255, 0);
+            cell.setRectangle(new Point(155, 155));
+            snake.add(cell);
+        }else {
+            Cell cell = new Cell();
+            cell.setColor(128, 128, 128);
+            Point position = snake.get(snake.size()-1).getPosition();
+            cell.setRectangle(position);
             snake.add(cell);
         }
-        Cell cell = new Cell();
-        Point position = snake.get(snake.size()-1).getPosition();
-        cell.setRectangle(new Point(position.coordX - 10, position.coordY));
-        snake.add(cell);
     }
 
     public void move() {
-        for(Cell c:snake) {
-            Point p = c.getPosition();
-            switch (directions){
-                case UP: {
-                    c.moveTo(new Point(p.coordX, p.coordY - 5));
-                    break;
-                }
-                case DOWN: {
-                    c.moveTo(new Point(p.coordX, p.coordY + 5));
-                    break;
-                }
-                case LEFT: {
-                    c.moveTo(new Point(p.coordX - 5, p.coordY));
-                    break;
-                }
-                case RIGHT: {
-                    c.moveTo(new Point(p.coordX + 5, p.coordY));
-                    break;
-                }
+        Cell head = snake.get(0);
+        Point lastHeadPos = head.getPosition();
+        move(snake.get(0), directions);
+        for(int i = 1; i < snake.size(); i++) {
+            Cell c = snake.get(i);
+            Point lastBodyPos = c.getPosition();
+            c.moveTo(lastHeadPos);
+            lastHeadPos = lastBodyPos;
+        }
+    }
+
+    private void move(Cell c, Directions directions) {
+        Point p = c.getPosition();
+        switch (directions){
+            case UP: {
+                c.moveTo(new Point(p.coordX, p.coordY - 10));
+                break;
+            }
+            case DOWN: {
+                c.moveTo(new Point(p.coordX, p.coordY + 10));
+                break;
+            }
+            case LEFT: {
+                c.moveTo(new Point(p.coordX - 10, p.coordY));
+                break;
+            }
+            case RIGHT: {
+                c.moveTo(new Point(p.coordX + 10, p.coordY));
+                break;
             }
         }
     }
 
     public void setDirections(Directions directions) {
-        Cell c = snake.get(0);
-        Point point = c.getPosition();
-        rotations.add(new Rotation(point, directions));
+        if(
+                (this.directions == Directions.RIGHT && directions == Directions.LEFT) ||
+                        (this.directions == Directions.LEFT && directions == Directions.RIGHT) ||
+                        (this.directions == Directions.UP && directions == Directions.DOWN) ||
+                        (this.directions == Directions.DOWN && directions == Directions.UP)
+        ) {
+            return;
+        }
         this.directions = directions;
+    }
+
+    public void absorb(Food food, Timer timer, int delay) {
+        if(food.isEatable()) {
+            Cell h = snake.get(0);
+            Cell f = food.getCell();
+            if(h.intersects(f)) {
+                food.toggle();
+                addCell();
+                food.setNewRandPosition(snake);
+                food.toggle();
+                delay = delay - 25;
+                timer.setDelay(delay);
+            }
+        }
+    }
+
+    public boolean selfIntersection() {
+        for(int i = 1; i < snake.size(); i++) {
+            Cell c = snake.get(i);
+            if(c.intersects(snake.get(0))){
+                return true;
+            }
+        }
+        return false;
     }
 
     public void draw(Graphics2D g) {
