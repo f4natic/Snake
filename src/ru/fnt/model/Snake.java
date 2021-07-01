@@ -30,7 +30,7 @@ public class Snake {
         if(snake.isEmpty()) {
             Cell cell = new Cell();
             cell.setColor(0, 255, 0);
-            cell.setRectangle(new Point(155, 155));
+            cell.setRectangle(new Point(15, 15));
             snake.add(cell);
         }else {
             Cell cell = new Cell();
@@ -87,7 +87,7 @@ public class Snake {
         this.directions = directions;
     }
 
-    public void absorb(Food food, Timer timer, int delay) {
+    public boolean absorb(Food food) {
         if(food.isEatable()) {
             Cell h = snake.get(0);
             Cell f = food.getCell();
@@ -96,10 +96,10 @@ public class Snake {
                 addCell();
                 food.setNewRandPosition(snake);
                 food.toggle();
-                delay = delay - 25;
-                timer.setDelay(delay);
+                return true;
             }
         }
+        return false;
     }
 
     public boolean selfIntersection() {
@@ -110,6 +110,10 @@ public class Snake {
             }
         }
         return false;
+    }
+
+    public int snakeSize() {
+        return snake.size() - 2;
     }
 
     public void draw(Graphics2D g) {

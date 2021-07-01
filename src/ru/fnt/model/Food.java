@@ -11,12 +11,22 @@ public class Food {
     private Cell food;
     private boolean isAte = true;
     private Random rnd;
+    private int[] position;
 
     public Food() {
         food = new Cell();
         food.setColor(237, 28, 36);
-        food.setRectangle(new Point(55, 55));
+        food.setRectangle(new Point(155, 155));
+        food.setRectangle(new Point(155, 155));
         rnd = new Random();
+        position = new int[30];
+        for(int i = 0; i <30; i++) {
+            if(i == 0) {
+                position[i] = 5;
+            }else {
+                position[i] = position[i-1] + 10;
+            }
+        }
     }
 
     public void setPosition(Point point) {
@@ -46,20 +56,8 @@ public class Food {
     }
 
     public void setNewRandPosition(List<Cell> snake) {
-        int x = rnd.nextInt(296);
-        int y =  rnd.nextInt(296);
-
-        if(
-                !(x % 5 == 0)&&(x % 10 == 0) &&
-                !(x % 5 == 0)&&(x % 10 == 0)
-        ){
-            x = rnd.nextInt(296);
-            y =  rnd.nextInt(296);
-        }
-
-        Point p = new Point(x, y);
+        Point p = new Point(position[rnd.nextInt(30)], position[rnd.nextInt(30)]);
         food.moveTo(p);
-
         for(Cell c : snake) {
             if(c.intersects(food)){
                 setNewRandPosition(snake);
