@@ -22,6 +22,7 @@ public class Canvas extends JPanel implements ActionListener {
     private int baseDelay = 500;
     private int delay = 500;
     private boolean paused = false;
+    private boolean keyLock = false;
     private Rectangle2D[][] field;
 
     public Canvas(Run run) {
@@ -48,17 +49,24 @@ public class Canvas extends JPanel implements ActionListener {
             @Override
             public void keyPressed(KeyEvent e) {
                 super.keyPressed(e);
+                if(keyLock) {
+                    return;
+                }
                 if(e.getKeyCode() == KeyEvent.VK_UP) {
                     snake.setDirections(Directions.UP);
+                    keyLock = true;
                 }
                 if(e.getKeyCode() == KeyEvent.VK_DOWN) {
                     snake.setDirections(Directions.DOWN);
+                    keyLock = true;
                 }
                 if(e.getKeyCode() == KeyEvent.VK_LEFT) {
                     snake.setDirections(Directions.LEFT);
+                    keyLock = true;
                 }
                 if(e.getKeyCode() == KeyEvent.VK_RIGHT) {
                     snake.setDirections(Directions.RIGHT);
+                    keyLock = true;
                 }
                 if(e.getKeyCode() == KeyEvent.VK_SPACE) {
                     if(paused) {
@@ -74,6 +82,7 @@ public class Canvas extends JPanel implements ActionListener {
             @Override
             public void keyReleased(KeyEvent e) {
                 super.keyReleased(e);
+                keyLock = false;
             }
         });
 
