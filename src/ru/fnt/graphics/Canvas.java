@@ -21,6 +21,7 @@ public class Canvas extends JPanel implements ActionListener {
     private JLabel label;
     private int baseDelay = 500;
     private int delay = 500;
+    private boolean paused = false;
     private Rectangle2D[][] field;
 
     public Canvas(Run run) {
@@ -29,8 +30,8 @@ public class Canvas extends JPanel implements ActionListener {
         snake = new Snake();
         food = new Food();
         label = new JLabel();
-        label.setText("Score:" + String.valueOf(score) + " Speed: " + (100+(baseDelay-delay)/100) + "%");
-        label.setBounds(0, 305, Run.SIDE, 15);
+        label.setText("Score:" + String.valueOf(score) + " Speed: " + ((100*(baseDelay-delay)/baseDelay))  + "%");
+        label.setBounds(0, Run.SIDE+5, Run.SIDE, 15);
         add(label);
 
         timer = new Timer(delay, this);
@@ -58,6 +59,15 @@ public class Canvas extends JPanel implements ActionListener {
                 }
                 if(e.getKeyCode() == KeyEvent.VK_RIGHT) {
                     snake.setDirections(Directions.RIGHT);
+                }
+                if(e.getKeyCode() == KeyEvent.VK_SPACE) {
+                    if(paused) {
+                        timer.start();
+                        paused = false;
+                    }else {
+                        timer.stop();
+                        paused = true;
+                    }
                 }
             }
 
@@ -98,7 +108,7 @@ public class Canvas extends JPanel implements ActionListener {
             score = snake.snakeSize() * 5;
         }
         checkWorlBounds();
-        label.setText("Score:" + String.valueOf(score) + " Speed: " + (100+(baseDelay-delay)/100) + "%");
+        label.setText("Score:" + String.valueOf(score) + " Speed: " + ((100*(baseDelay-delay)/baseDelay))  + "%");
         repaint();
     }
 
@@ -112,10 +122,10 @@ public class Canvas extends JPanel implements ActionListener {
                         snake.selfIntersection()
         ) {
             JOptionPane.showConfirmDialog(null,
-                    "Вы проирали!",
-                    "=(",
+                    "You SCORE:"+score,
+                    "END",
                     JOptionPane.CLOSED_OPTION,
-                    JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.INFORMATION_MESSAGE);
             System.exit(0);
         }
         return false;

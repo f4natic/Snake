@@ -1,5 +1,6 @@
 package ru.fnt.model;
 
+import ru.fnt.Run;
 import ru.fnt.base.Cell;
 import ru.fnt.util.Point;
 
@@ -19,8 +20,8 @@ public class Food {
         food.setRectangle(new Point(155, 155));
         food.setRectangle(new Point(155, 155));
         rnd = new Random();
-        position = new int[30];
-        for(int i = 0; i <30; i++) {
+        position = new int[Run.SIDE/10];
+        for(int i = 0; i < position.length; i++) {
             if(i == 0) {
                 position[i] = 5;
             }else {
@@ -56,7 +57,7 @@ public class Food {
     }
 
     public void setNewRandPosition(List<Cell> snake) {
-        Point p = new Point(position[rnd.nextInt(30)], position[rnd.nextInt(30)]);
+        Point p = new Point(position[rnd.nextInt(Run.SIDE/10)], position[rnd.nextInt(Run.SIDE/10)]);
         food.moveTo(p);
         for(Cell c : snake) {
             if(c.intersects(food)){
