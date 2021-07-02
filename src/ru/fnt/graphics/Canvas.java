@@ -18,22 +18,30 @@ public class Canvas extends JPanel implements ActionListener {
     private Food food;
     private Timer timer;
     private int score = 0;
-    private JLabel label;
-    private int baseDelay = 500;
-    private int delay = 500;
+    private JLabel infoLabel;
+    private JLabel pauseLabel;
+    private int baseDelay = 200;
+    private int delay = baseDelay;
     private boolean paused = false;
     private boolean keyLock = false;
     private Rectangle2D[][] field;
+    private JPanel panel;
 
     public Canvas(Run run) {
         run.resize();
         setLayout(null);
+        panel = this;
         snake = new Snake();
         food = new Food();
-        label = new JLabel();
-        label.setText("Score:" + String.valueOf(score) + " Speed: " + ((100*(baseDelay-delay)/baseDelay))  + "%");
-        label.setBounds(0, Run.SIDE+5, Run.SIDE, 15);
-        add(label);
+        infoLabel = new JLabel();
+        infoLabel.setText("Score:" + String.valueOf(score) + " Speed: " + ((100*(baseDelay-delay)/baseDelay))  + "%");
+        infoLabel.setBounds(0, Run.SIDE+5, Run.SIDE, 15);
+        pauseLabel = new JLabel();
+        pauseLabel.setBounds(Run.SIDE/2-Run.SIDE/4, Run.SIDE/2-25, Run.SIDE, 50);
+        pauseLabel.setText("PAUSE");
+        pauseLabel.setFont(new Font("SansSerif", Font.BOLD|Font.ITALIC, 36));
+        pauseLabel.setForeground(Color.LIGHT_GRAY);
+        add(infoLabel);
 
         timer = new Timer(delay, this);
         timer.start();
@@ -72,9 +80,13 @@ public class Canvas extends JPanel implements ActionListener {
                     if(paused) {
                         timer.start();
                         paused = false;
+                        panel.remove(pauseLabel);
+                        panel.repaint();
                     }else {
                         timer.stop();
                         paused = true;
+                        panel.add(pauseLabel);
+                        panel.repaint();
                     }
                 }
             }
@@ -112,12 +124,12 @@ public class Canvas extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         snake.move();
         if(snake.absorb(food)) {
-            delay = (int)(delay - Math.sqrt(delay / 2) * 1.1);
+            delay = (int)(delay - (Math.sqrt(delay / 2) * 1.1)/delay);
             timer.setDelay(delay);
-            score = snake.snakeSize() * 5;
+            score = snake.snakeSize() * 5 - 2 * 5;
         }
         checkWorlBounds();
-        label.setText("Score:" + String.valueOf(score) + " Speed: " + ((100*(baseDelay-delay)/baseDelay))  + "%");
+        infoLabel.setText("Score:" + String.valueOf(score) + " Speed: " + ((100*(baseDelay-delay)/baseDelay))  + "%");
         repaint();
     }
 

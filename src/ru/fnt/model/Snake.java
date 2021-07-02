@@ -113,7 +113,7 @@ public class Snake {
     }
 
     public int snakeSize() {
-        return snake.size() - 2;
+        return snake.size();
     }
 
     public void draw(Graphics2D g) {
