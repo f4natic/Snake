@@ -1,8 +1,8 @@
 package ru.fnt.graphics;
 
+import ru.fnt.controller.Controller;
 import ru.fnt.Run;
 import ru.fnt.base.Cell;
-import ru.fnt.base.Directions;
 import ru.fnt.model.Food;
 import ru.fnt.model.Snake;
 import ru.fnt.util.Point;
@@ -19,84 +19,29 @@ public class Canvas extends JPanel implements ActionListener {
     private Timer timer;
     private int score = 0;
     private JLabel infoLabel;
-    private JLabel pauseLabel;
-    private int baseDelay = 200;
+    private int baseDelay = 500;
     private int delay = baseDelay;
     private boolean paused = false;
     private boolean keyLock = false;
     private Rectangle2D[][] field;
-    private JPanel panel;
+
+    private Controller controller;
 
     public Canvas(Run run) {
         run.resize();
         setLayout(null);
-        panel = this;
-        snake = new Snake();
+        timer = new Timer(delay, this);
+        controller = new Controller(timer, this);
+        snake = new Snake(controller);
         food = new Food();
         infoLabel = new JLabel();
-        infoLabel.setText("Score:" + String.valueOf(score) + " Speed: " + ((100*(baseDelay-delay)/baseDelay))  + "%");
+        infoLabel.setText("Score:" + score + " Speed: " + ((100*(baseDelay-delay)/baseDelay))  + "%");
         infoLabel.setBounds(0, Run.SIDE+5, Run.SIDE, 15);
-        pauseLabel = new JLabel();
-        pauseLabel.setBounds(Run.SIDE/2-Run.SIDE/4, Run.SIDE/2-25, Run.SIDE, 50);
-        pauseLabel.setText("PAUSE");
-        pauseLabel.setFont(new Font("SansSerif", Font.BOLD|Font.ITALIC, 36));
-        pauseLabel.setForeground(Color.LIGHT_GRAY);
         add(infoLabel);
-
-        timer = new Timer(delay, this);
-        timer.start();
 
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
-        addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-                super.keyTyped(e);
-            }
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-                super.keyPressed(e);
-                if(keyLock) {
-                    return;
-                }
-                if(e.getKeyCode() == KeyEvent.VK_UP) {
-                    snake.setDirections(Directions.UP);
-                    keyLock = true;
-                }
-                if(e.getKeyCode() == KeyEvent.VK_DOWN) {
-                    snake.setDirections(Directions.DOWN);
-                    keyLock = true;
-                }
-                if(e.getKeyCode() == KeyEvent.VK_LEFT) {
-                    snake.setDirections(Directions.LEFT);
-                    keyLock = true;
-                }
-                if(e.getKeyCode() == KeyEvent.VK_RIGHT) {
-                    snake.setDirections(Directions.RIGHT);
-                    keyLock = true;
-                }
-                if(e.getKeyCode() == KeyEvent.VK_SPACE) {
-                    if(paused) {
-                        timer.start();
-                        paused = false;
-                        panel.remove(pauseLabel);
-                        panel.repaint();
-                    }else {
-                        timer.stop();
-                        paused = true;
-                        panel.add(pauseLabel);
-                        panel.repaint();
-                    }
-                }
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-                super.keyReleased(e);
-                keyLock = false;
-            }
-        });
+        addKeyListener(controller);
 
         field = new Rectangle2D[30][30];
         for(int i = 0; i < 300; i+=10) {
@@ -104,6 +49,8 @@ public class Canvas extends JPanel implements ActionListener {
                 field[i/10][j/10] = new Rectangle2D.Double(i, j, 10, 10);
             }
         }
+
+        timer.start();
     }
 
     @Override
@@ -124,12 +71,12 @@ public class Canvas extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         snake.move();
         if(snake.absorb(food)) {
-            delay = (int)(delay - (Math.sqrt(delay / 2) * 1.1)/delay);
+            delay = (int)(delay - (Math.sqrt(delay / 2D) * 1.1)/delay);
             timer.setDelay(delay);
             score = snake.snakeSize() * 5 - 2 * 5;
         }
         checkWorlBounds();
-        infoLabel.setText("Score:" + String.valueOf(score) + " Speed: " + ((100*(baseDelay-delay)/baseDelay))  + "%");
+        infoLabel.setText("Score:" + score + " Speed: " + ((100*(baseDelay-delay)/baseDelay))  + "%");
         repaint();
     }
 
@@ -137,16 +84,14 @@ public class Canvas extends JPanel implements ActionListener {
         Cell cell = snake.getHead();
         Point position = cell.getPosition();
         if(
-                position.coordX < 5 || position.coordX > Run.SIDE - 5 ||
-                        position.coordY < 5 || position.coordY > Run.SIDE - 5 ||
-                        position.coordY < 5 || position.coordY > Run.SIDE - 5 ||
-                        snake.selfIntersection()
+            position.coordX < 5 || position.coordX > Run.SIDE - 5 ||
+            position.coordY < 5 || position.coordY > Run.SIDE - 5 ||
+            snake.selfIntersection()
         ) {
             JOptionPane.showConfirmDialog(null,
                     "You SCORE:"+score,
                     "END",
-                    JOptionPane.CLOSED_OPTION,
-                    JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.CANCEL_OPTION);
             System.exit(0);
         }
         return false;

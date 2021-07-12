@@ -11,8 +11,8 @@ public class Cell {
     private final int SIDE = 10;
 
     public void setRectangle(Point point) {
-        double x = point.coordX - SIDE / 2;
-        double y = point.coordY - SIDE / 2;
+        double x = point.coordX - SIDE / 2D;
+        double y = point.coordY - SIDE / 2D;
         rect = new Rectangle2D.Double(x, y, SIDE, SIDE);
     }
 
@@ -24,9 +24,13 @@ public class Cell {
         color = new Color(r, g, b);
     }
 
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
     public void moveTo(Point point) {
-        double x = point.coordX - SIDE / 2;
-        double y = point.coordY - SIDE / 2;
+        double x = point.coordX - SIDE / 2D;
+        double y = point.coordY - SIDE / 2D;
         rect = new Rectangle2D.Double(x, y, SIDE, SIDE);
     }
 
@@ -39,15 +43,14 @@ public class Cell {
             return;
         }
         g.setColor(color);
-        g.draw(rect);
         g.fill(rect);
+        g.setColor(Color.BLACK);
+        g.setStroke(new BasicStroke(2));
+        g.draw(rect);
     }
 
     public boolean intersects(Cell cell) {
         Rectangle2D rect2 = cell.getRectangle();
-        if(rect.intersects(rect2)){
-            return true;
-        }
-        return false;
+        return rect.intersects(rect2);
     }
 }

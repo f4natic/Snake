@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ru.fnt.base.Directions;
+import ru.fnt.controller.Controller;
 import ru.fnt.util.Point;
 
 import javax.swing.*;
@@ -14,9 +15,12 @@ import javax.swing.*;
 public class Snake {
 
     private List<Cell> snake;
-    private Directions directions = Directions.RIGHT;
+    private Controller controller;
+    private Directions direction = Directions.RIGHT;
 
-    public Snake() {
+    public Snake(Controller controller) {
+        this.controller = controller;
+
         snake = new ArrayList<>();
         addCell();
         addCell();
@@ -29,7 +33,7 @@ public class Snake {
     public void addCell() {
         if(snake.isEmpty()) {
             Cell cell = new Cell();
-            cell.setColor(0, 255, 0);
+            cell.setColor(Color.RED);
             cell.setRectangle(new Point(15, 15));
             snake.add(cell);
         }else {
@@ -42,6 +46,15 @@ public class Snake {
     }
 
     public void move() {
+        Directions directions = controller.getDirection();
+        if(
+            direction == Directions.RIGHT && directions == Directions.LEFT ||
+            direction == Directions.LEFT && directions == Directions.RIGHT ||
+            direction == Directions.UP && directions == Directions.DOWN ||
+            direction == Directions.DOWN && directions == Directions.UP
+        ) {
+            directions = direction;
+        }
         Cell head = snake.get(0);
         Point lastHeadPos = head.getPosition();
         move(snake.get(0), directions);
@@ -51,6 +64,7 @@ public class Snake {
             c.moveTo(lastHeadPos);
             lastHeadPos = lastBodyPos;
         }
+        direction = directions;
     }
 
     private void move(Cell c, Directions directions) {
@@ -73,18 +87,6 @@ public class Snake {
                 break;
             }
         }
-    }
-
-    public void setDirections(Directions directions) {
-        if(
-                (this.directions == Directions.RIGHT && directions == Directions.LEFT) ||
-                        (this.directions == Directions.LEFT && directions == Directions.RIGHT) ||
-                        (this.directions == Directions.UP && directions == Directions.DOWN) ||
-                        (this.directions == Directions.DOWN && directions == Directions.UP)
-        ) {
-            return;
-        }
-        this.directions = directions;
     }
 
     public boolean absorb(Food food) {

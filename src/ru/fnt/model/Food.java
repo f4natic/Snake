@@ -16,7 +16,7 @@ public class Food {
 
     public Food() {
         food = new Cell();
-        food.setColor(237, 28, 36);
+        food.setColor(Color.GREEN);
         food.setRectangle(new Point(155, 155));
         food.setRectangle(new Point(155, 155));
         rnd = new Random();
@@ -35,11 +35,7 @@ public class Food {
     }
 
     public void toggle() {
-        if(isAte) {
-            isAte = false;
-        }else {
-            isAte = true;
-        }
+        isAte = !isAte;
     }
 
     public boolean isEatable() {
